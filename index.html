@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>
+		Lesson25
+	</title>
+	<link rel="stylesheet" type="text/css" href="assets/style/style.css">
+</head>
+<body>
+	<script type="text/javascript">
+
+		fetch('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json')
+			.then (res => res.json())
+			.then (function (res){
+
+				const exchangeForm = document.createElement('form');
+				const amountExchange  = document.createElement('input');
+					amountExchange.setAttribute('placeholder', 'Enter amount');
+				const currFrom = document.createElement('select');
+					currFrom.classList = 'currFrom';
+					currFrom.setAttribute('id','currFromID');
+				const currFromLabel = document.createElement('label');
+					currFromLabel.setAttribute('for','currFromID');
+					currFromLabel.innerText = 'Exchange from:'
+				const currTo  = document.createElement('select');
+					currTo.classList = 'currTo';
+					currTo.setAttribute('id','currToID');
+				const defaultCurrency = document.createElement('option');
+					defaultCurrency.setAttribute ( 'value', 'UAH' );
+					defaultCurrency.innerText = 'UAH';
+				const currToLabel = document.createElement('label');
+					currToLabel.setAttribute('for','currToID');
+					currToLabel.innerText = 'To:'	
+				const buttonExchange = document.createElement('button');
+					buttonExchange.innerText = 'Calculate';
+					buttonExchange.setAttribute('type', 'submit');
+				const resultBlock = document.createElement('div');
+				const resultTextAbout  = document.createElement('span');
+					resultTextAbout.innerText = 'You will get:'
+				const resultAmount = document.createElement('p');
+
+				document.body.prepend(resultBlock);
+				document.querySelector('div').prepend(resultAmount);
+				document.querySelector('div').prepend(resultTextAbout);
+				document.body.prepend(exchangeForm);
+				document.querySelector('form').append(currFromLabel);
+				document.querySelector('form').append(currFrom);
+				document.querySelector('form').append(amountExchange);
+				document.querySelector('form').append(currToLabel);
+				document.querySelector('form').append(currTo);
+				document.querySelector ( '.currTo' ).prepend(defaultCurrency);
+				document.querySelector('form').append(buttonExchange);
+
+				res.forEach ( function ( item ) {
+						const selectValue = document.createElement ( 'option' ) ;
+						selectValue.setAttribute ( 'value', item.cc ) ;
+						selectValue.innerText = item.cc;
+						document.querySelector ( '.currFrom' ) .append(selectValue);
+					})
+
+				res.forEach ( function ( item ) {
+						const selectValue = document.createElement ( 'option' ) ;
+						selectValue.setAttribute ( 'value', item.cc ) ;
+						selectValue.innerText = item.cc;
+						document.querySelector ( '.currTo' ) .append(selectValue);
+					})  
+
+				buttonExchange.addEventListener('click', function(event){
+					event.preventDefault();
+					const currFromValue = document.querySelector ( '.currFrom' ).value;
+					const currToValue = document.querySelector ( '.currTo' ).value;
+					const valueToExchange = +document.querySelector ( 'input' ).value;
+					if (valueToExchange > 0 && valueToExchange !==''){
+						if (currToValue === 'UAH'){
+							const resultOfExchang = valueToExchange*res.find ( item => item.cc === currFromValue).rate
+							resultAmount.innerText = resultOfExchang.toFixed(2) +' '+ currToValue;
+						} else {
+							const resultOfExchang = valueToExchange*res.find ( item => item.cc===currFromValue).rate/res.find(item => item.cc===currToValue).rate
+							resultAmount.innerText = resultOfExchang.toFixed(2) +' '+ currToValue;
+						}
+					} else {
+						document.querySelector('input').value='';
+						return alert('Please, enter the correct value greater than zero with digits! ');
+
+					}
+				})		
+				
+			})
+
+	</script>
+</body>
+</html>
